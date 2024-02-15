@@ -1,13 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function ListWithInput() {
   const [items, setItems] = useState([]);
   const [inputValue, setInputValue] = useState('');
 
+  useEffect(() => {
+    const storedItems = JSON.parse(localStorage.getItem('todos'));
+    if (storedItems) {
+      setItems(storedItems);
+    } else {
+      fetch('https://playground.4geeks.com/apis/fake/todos/user/LuciaPach')
+        .then(response => response.json())
+        .then(data => {
+          if (Array.isArray(data.todos)) { // Verificar si "data.todos" es un array
+            setItems(data.todos);
+            localStorage.setItem('todos', JSON.stringify(data.todos));
+          } else {
+            console.error('La respuesta de la API no contiene un array de elementos');
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  }, []);
+
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && inputValue.trim() !== '') {
       const newItem = inputValue.trim();
-      setItems([...items, newItem]);
+      const updatedItems = [...items, newItem];
+      setItems(updatedItems);
+      localStorage.setItem('todos', JSON.stringify(updatedItems)); // Guardar los datos en localStorage
       setInputValue('');
     }
   };
@@ -16,6 +37,7 @@ function ListWithInput() {
     const updatedItems = [...items];
     updatedItems.splice(index, 1);
     setItems(updatedItems);
+    localStorage.setItem('todos', JSON.stringify(updatedItems)); // Guardar los datos en localStorage
   };
 
   const remainingItemCount = items.length;
