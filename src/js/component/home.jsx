@@ -12,7 +12,7 @@ function ListWithInput() {
       fetch('https://playground.4geeks.com/apis/fake/todos/user/LuciaPach')
         .then(response => response.json())
         .then(data => {
-          if (Array.isArray(data.todos)) { // Verificar si "data.todos" es un array
+          if (Array.isArray(data.todos)) {
             setItems(data.todos);
             localStorage.setItem('todos', JSON.stringify(data.todos));
           } else {
@@ -28,7 +28,7 @@ function ListWithInput() {
       const newItem = inputValue.trim();
       const updatedItems = [...items, newItem];
       setItems(updatedItems);
-      localStorage.setItem('todos', JSON.stringify(updatedItems)); // Guardar los datos en localStorage
+      localStorage.setItem('todos', JSON.stringify(updatedItems));
       setInputValue('');
     }
   };
@@ -37,7 +37,20 @@ function ListWithInput() {
     const updatedItems = [...items];
     updatedItems.splice(index, 1);
     setItems(updatedItems);
-    localStorage.setItem('todos', JSON.stringify(updatedItems)); // Guardar los datos en localStorage
+    localStorage.setItem('todos', JSON.stringify(updatedItems));
+  };
+
+  const handleDeleteAllItems = () => {
+    fetch('https://playground.4geeks.com/apis/fake/todos/user/LuciaPach', {
+      method: 'DELETE',
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Todos eliminados:', data);
+        setItems([]);
+        localStorage.removeItem('todos');
+      })
+      .catch(error => console.error('Error al eliminar todos los elementos:', error));
   };
 
   const remainingItemCount = items.length;
@@ -86,6 +99,12 @@ function ListWithInput() {
             <div className="width-99" style={{boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)', border: '1px solid rgba(255, 182, 193, 0.3)'}}></div>
             <div className="width-98" style={{ boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)', border: '1px solid rgba(255, 182, 193, 0.3)'}}></div>
           </div>
+          <button
+            onClick={handleDeleteAllItems}
+            style={{ marginTop: '10px', background: '#ff99cc', border: 'none', color: '#fff', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer' }}
+          >
+            Delete All Items
+          </button>
         </div>
       </div>
     </div>
